@@ -1,0 +1,62 @@
+<header class="navbar-header">
+  <div class="container navbar-container">
+    <a routerLink="/" class="logo-group">
+      <div class="logo-icon">🌸</div>
+      <div class="logo-text">
+        <span class="brand-title">MIND CARE</span>
+        <span class="brand-subtitle">Student Wellness</span>
+      </div>
+    </a>
+
+    <nav class="desktop-nav">
+      @if (authService.isLoggedIn()) {
+        <!-- Student Authenticated Links -->
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/mood" routerLinkActive="active">Mood</a>
+        <a routerLink="/stress" routerLinkActive="active">Stress</a>
+        <a routerLink="/journal" routerLinkActive="active">Journal</a>
+        <a routerLink="/resources" routerLinkActive="active">Wellness</a>
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="active" class="badge-admin">Admin Panel</a>
+        }
+        
+        <div class="user-menu">
+          <span class="user-greeting">Hi, {{ authService.currentUser()?.name }}</span>
+          <button (click)="logout()" class="btn-logout">Logout</button>
+        </div>
+      } @else {
+        <!-- Public Links -->
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/about" routerLinkActive="active">About Project</a>
+        <a routerLink="/resources" routerLinkActive="active">Wellness Resources</a>
+        <a routerLink="/login" class="nav-btn-secondary">Login</a>
+        <a routerLink="/register" class="nav-btn-primary">Register</a>
+      }
+    </nav>
+
+    <button class="hamburger-btn" (click)="toggleMobileMenu()" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  @if (mobileMenuOpen) {
+    <div class="mobile-nav">
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/dashboard" (click)="mobileMenuOpen = false">Dashboard</a>
+        <a routerLink="/mood" (click)="mobileMenuOpen = false">Mood Tracker</a>
+        <a routerLink="/stress" (click)="mobileMenuOpen = false">Stress Assessment</a>
+        <a routerLink="/journal" (click)="mobileMenuOpen = false">Daily Journal</a>
+        <a routerLink="/resources" (click)="mobileMenuOpen = false">Wellness Resources</a>
+        <button (click)="logout()" class="btn-logout-mobile">Logout</button>
+      } @else {
+        <a routerLink="/" (click)="mobileMenuOpen = false">Home</a>
+        <a routerLink="/about" (click)="mobileMenuOpen = false">About Project</a>
+        <a routerLink="/resources" (click)="mobileMenuOpen = false">Wellness Resources</a>
+        <a routerLink="/login" (click)="mobileMenuOpen = false">Login</a>
+        <a routerLink="/register" (click)="mobileMenuOpen = false">Register</a>
+      }
+    </div>
+  }
+</header>

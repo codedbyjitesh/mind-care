@@ -1,0 +1,64 @@
+<div class="auth-page">
+  <div class="container auth-container">
+
+    @if (registrationComplete) {
+      <!-- Email Verification Sent State -->
+      <div class="glass-card auth-card verification-sent">
+        <div class="sent-icon">📧</div>
+        <h2>Check Your Email!</h2>
+        <p>A verification email has been sent to:</p>
+        <div class="email-highlight">{{ registeredEmail }}</div>
+        <p class="sent-desc">Please click the verification link in that email to activate your Mind Care account before logging in.</p>
+        <div class="sent-tips">
+          <p>📁 Not in inbox? Check your <strong>Spam / Junk</strong> folder.</p>
+          <p>⏳ Link expires in <strong>24 hours</strong>.</p>
+        </div>
+        <a routerLink="/login" class="btn btn-primary" style="width:100%; margin-top: 1.5rem; display:block; text-align:center;">
+          Go to Login
+        </a>
+      </div>
+    } @else {
+      <div class="glass-card auth-card">
+        <div class="auth-header">
+          <div class="auth-icon">🎓</div>
+          <h2>Create Student Account</h2>
+          <p>Start tracking your mood and stress wellness</p>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">⚠️ {{ errorMessage }}</div>
+        }
+
+        <form (ngSubmit)="onSubmit()" class="auth-form">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" [(ngModel)]="name"
+              class="form-control" placeholder="Alex Morgan" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Student Email Address</label>
+            <input type="email" id="reg-email" name="email" [(ngModel)]="email"
+              class="form-control" placeholder="student@university.edu" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" name="password" [(ngModel)]="password"
+              class="form-control" placeholder="At least 6 characters" required />
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirmPassword" [(ngModel)]="confirmPassword"
+              class="form-control" placeholder="Re-enter password" required />
+          </div>
+          <button type="submit" [disabled]="loading" class="btn btn-primary btn-block">
+            {{ loading ? 'Creating Account...' : 'Create Free Account' }}
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Already have an account? <a routerLink="/login">Login here</a></p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

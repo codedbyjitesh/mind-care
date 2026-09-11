@@ -1,0 +1,96 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container hero-container">
+    <div class="hero-badge">
+      <span class="badge badge-teal">BSc IT Research Project</span>
+      <span class="badge badge-blue">Student Mental Health</span>
+    </div>
+
+    <h1 class="hero-title">
+      Your Personal Space for <br />
+      <span class="highlight-text">Mental Wellness & Stress Balance</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Track daily moods, assess stress levels, maintain a private encrypted journal, practice guided relaxation exercises, and cultivate healthy habits designed for student success.
+    </p>
+
+    <div class="hero-actions">
+      <a routerLink="/register" class="btn btn-primary">
+        🚀 Get Started Free
+      </a>
+      <a routerLink="/login" class="btn btn-secondary">
+        🔑 Student Login
+      </a>
+    </div>
+
+    <!-- Backend Status Banner (Phase 1 Verification) -->
+    <div class="api-status-card glass-card">
+      <div class="status-header">
+        <span class="status-icon">⚡</span>
+        <strong>Backend REST API Connection Status:</strong>
+      </div>
+      <div class="status-body">
+        @if (loadingStatus) {
+          <span class="status-badge loading">Connecting to Express API...</span>
+        } @else if (apiError) {
+          <span class="status-badge error">Backend Disconnected (Run Express Server on Port 5000)</span>
+        } @else {
+          <span class="status-badge success">
+            Connected: {{ apiStatus?.app }} (v{{ apiStatus?.version }})
+          </span>
+        }
+        <button class="btn-refresh" (click)="checkBackendHealth()" title="Refresh connection">🔄</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Key Features Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge badge-green">Core Features</span>
+      <h2>Designed Specifically for Student Life</h2>
+      <p>Self-care tools to support academic balance and peace of mind.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="glass-card feature-card">
+        <div class="feature-icon teal">😄</div>
+        <h3>Daily Mood Tracking</h3>
+        <p>Log your daily emotional state, identify triggers like exams or studies, and observe long-term trends.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon blue">📊</div>
+        <h3>Stress Assessment</h3>
+        <p>Complete non-clinical student questionnaires to receive immediate, practical wellness recommendations.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon green">📝</div>
+        <h3>Private Journal</h3>
+        <p>Reflect in a secure private journal accessible only by you. Express your thoughts with complete privacy.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon blue">🫁</div>
+        <h3>Guided Breathing</h3>
+        <p>Interactive 4-4-6 breathing timer and relaxation sessions designed for study breaks and exam preparation.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon green">😴</div>
+        <h3>Sleep & Habit Tracker</h3>
+        <p>Monitor sleep duration and log positive daily habits like hydration, walking, and mindfulness.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon teal">🤖</div>
+        <h3>AI Wellness Companion</h3>
+        <p>Get supportive, non-clinical general guidance powered by supportive AI for study management.</p>
+      </div>
+    </div>
+  </div>
+</section>

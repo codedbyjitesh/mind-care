@@ -1,0 +1,49 @@
+<div class="auth-page">
+  <div class="container auth-container">
+    <div class="glass-card auth-card text-center">
+
+      @if (state === 'loading') {
+        <div class="state-icon">⏳</div>
+        <h2>Verifying Your Email...</h2>
+        <p>Please wait while we confirm your verification link.</p>
+      }
+
+      @if (state === 'success') {
+        <div class="state-icon success">✅</div>
+        <h2>Email Verified!</h2>
+        <p>{{ message }}</p>
+        <p class="sub-msg">Your Mind Care student account is fully active. You can now log in.</p>
+        <a routerLink="/login" class="btn btn-primary btn-block" style="margin-top:1.5rem;">Go to Login</a>
+      }
+
+      @if (state === 'expired') {
+        <div class="state-icon warn">⏰</div>
+        <h2>Verification Link Expired</h2>
+        <p>{{ message }}</p>
+
+        @if (resendMessage) {
+          <div class="alert alert-success">✅ {{ resendMessage }}</div>
+        } @else {
+          <div class="resend-form">
+            <p class="resend-label">Enter your email to receive a new verification link:</p>
+            <input type="email" [(ngModel)]="resendEmail" name="resendEmail" class="form-control"
+              placeholder="student@university.edu" />
+            <button class="btn btn-primary btn-block" style="margin-top:0.75rem;"
+              (click)="resendVerification()" [disabled]="resendLoading || !resendEmail">
+              {{ resendLoading ? 'Sending...' : '📧 Resend Verification Email' }}
+            </button>
+          </div>
+        }
+        <a routerLink="/login" class="back-link">← Back to Login</a>
+      }
+
+      @if (state === 'error') {
+        <div class="state-icon error">❌</div>
+        <h2>Verification Failed</h2>
+        <p>{{ message }}</p>
+        <a routerLink="/login" class="btn btn-primary btn-block" style="margin-top:1.5rem;">Back to Login</a>
+      }
+
+    </div>
+  </div>
+</div>
