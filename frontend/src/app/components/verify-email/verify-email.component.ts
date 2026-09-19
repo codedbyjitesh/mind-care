@@ -27,8 +27,8 @@ export class VerifyEmailComponent implements OnInit {
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
     if (!token) {
-      this.state = 'error';
-      this.message = 'No verification token found in the URL.';
+      this.state = 'expired';
+      this.message = 'No verification token was found in the link. Enter your email below to request a new link:';
       this.cdr.detectChanges();
       return;
     }
@@ -44,7 +44,7 @@ export class VerifyEmailComponent implements OnInit {
         } else {
           this.state = 'error';
         }
-        this.message = err?.message || 'Verification failed.';
+        this.message = err?.message || 'Verification link is invalid or has expired.';
         this.cdr.detectChanges();
       }
     });
@@ -53,15 +53,21 @@ export class VerifyEmailComponent implements OnInit {
   resendVerification() {
     if (!this.resendEmail) return;
     this.resendLoading = true;
+    this.resendMessage = '';
     this.authService.resendVerification(this.resendEmail).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.resendLoading = false;
-        this.resendMessage = 'Verification email sent! Check your inbox.';
+        if (res?.alreadyVerified) {
+          this.state = 'success';
+          this.message = res.message;
+        } else {
+          this.resendMessage = res?.message || 'Verification link sent! Please check your inbox and spam folder.';
+        }
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err: any) => {
         this.resendLoading = false;
-        this.resendMessage = 'Email sent if your address is registered.';
+        this.resendMessage = err?.message || 'Verification link sent if your email is registered.';
         this.cdr.detectChanges();
       }
     });

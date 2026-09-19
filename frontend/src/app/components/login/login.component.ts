@@ -62,14 +62,14 @@ export class LoginComponent {
 
   resendVerification() {
     this.authService.resendVerification(this.unverifiedEmail || this.email).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.errorMessage = '';
-        this.successMessage = 'Verification email sent! Check your inbox.';
+        this.successMessage = res?.message || 'Verification link sent! Check your inbox and spam folder.';
         this.emailNotVerified = false;
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.successMessage = 'Verification email sent! Check your inbox.';
+      error: (err: any) => {
+        this.successMessage = err?.message || 'Verification email request received. Please check your inbox.';
         this.cdr.detectChanges();
       }
     });

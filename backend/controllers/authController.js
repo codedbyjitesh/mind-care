@@ -33,7 +33,8 @@ const registerUser = async (req, res) => {
     await user.save();
 
     // Send verification email (falls back to console log if SMTP not configured)
-    await sendVerificationEmail(user.email, user.name, unhashedToken);
+    const origin = req.get('origin');
+    await sendVerificationEmail(user.email, user.name, unhashedToken, origin);
 
     res.status(201).json({
       message: 'Account created! Please check your email inbox to verify your account before logging in.',
@@ -124,7 +125,8 @@ const verifyEmail = async (req, res) => {
     await user.save();
 
     // Send welcome email
-    await sendWelcomeEmail(user.email, user.name);
+    const origin = req.get('origin');
+    await sendWelcomeEmail(user.email, user.name, origin);
 
     res.json({ message: 'Email verified successfully! Your Mind Care account is now active.', verified: true });
   } catch (error) {
@@ -146,24 +148,35 @@ const resendVerificationEmail = async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
-    // Generic response to prevent account enumeration
-    const genericResponse = { message: 'If this email is registered and unverified, a new verification link has been sent.' };
-
-    if (!user || user.emailVerified) {
-      return res.json(genericResponse);
+    // Generic response if not found
+    if (!user) {
+      return res.json({ message: 'If this email is registered and unverified, a new verification link has been sent.' });
     }
 
-    // Rate limiting: prevent spamming — cooldown 2 minutes
-    if (user.emailVerificationExpires && user.emailVerificationExpires > Date.now() + (22 * 60 * 60 * 1000)) {
-      return res.status(429).json({ message: 'A verification email was recently sent. Please wait a few minutes before requesting another.' });
+    // Explicit notification if account is already verified
+    if (user.emailVerified) {
+      return res.json({
+        message: 'This student account has already been verified! You can log in directly.',
+        alreadyVerified: true
+      });
+    }
+
+    // Rate limiting: 60-second cooldown between resends
+    const ONE_MINUTE = 60 * 1000;
+    if (user.emailVerificationExpires && (user.emailVerificationExpires - Date.now()) > (24 * 60 * 60 * 1000 - ONE_MINUTE)) {
+      return res.status(429).json({ message: 'A verification email was recently sent. Please wait a minute before requesting another.' });
     }
 
     const unhashedToken = user.getVerificationToken();
     await user.save();
 
-    await sendVerificationEmail(user.email, user.name, unhashedToken);
+    const origin = req.get('origin');
+    await sendVerificationEmail(user.email, user.name, unhashedToken, origin);
 
-    res.json(genericResponse);
+    res.json({
+      message: 'A new verification link has been sent to your email. Please check your inbox and spam folder.',
+      sent: true
+    });
   } catch (error) {
     console.error('[Resend Verification Error]:', error);
     res.status(500).json({ message: 'We could not send the email right now. Please try again later.' });
@@ -184,7 +197,10 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase() });
 
     // Always return generic response to prevent account enumeration
-    const genericResponse = { message: 'If this email is registered, a password reset link has been sent to your inbox.' };
+    const genericResponse = {
+      message: 'If this email is registered, a password reset link has been sent to your inbox. Please check your spam folder as well.',
+      sent: true
+    };
 
     if (!user) {
       return res.json(genericResponse);
@@ -193,7 +209,8 @@ const forgotPassword = async (req, res) => {
     const unhashedToken = user.getResetPasswordToken();
     await user.save();
 
-    await sendPasswordResetEmail(user.email, user.name, unhashedToken);
+    const origin = req.get('origin');
+    await sendPasswordResetEmail(user.email, user.name, unhashedToken, origin);
 
     res.json(genericResponse);
   } catch (error) {

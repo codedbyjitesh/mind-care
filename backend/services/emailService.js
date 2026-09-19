@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 
-// Create Nodemailer Transporter
 const createTransporter = () => {
   const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
   const port = parseInt(process.env.EMAIL_PORT, 10) || 587;
@@ -8,11 +7,27 @@ const createTransporter = () => {
   const pass = process.env.EMAIL_PASSWORD;
 
   if (user && pass) {
+    // If Gmail SMTP, using service: 'gmail' is standard and handles ports & SSL handshakes automatically
+    if (host.includes('gmail') || user.includes('@gmail.com')) {
+      return nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+        tls: { rejectUnauthorized: false }
+      });
+    }
+
     return nodemailer.createTransport({
       host,
       port,
-      secure: false, // true for 465, false for 587
-      auth: { user, pass }
+      secure: port === 465,
+      auth: { user, pass },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+      tls: { rejectUnauthorized: false }
     });
   }
 
@@ -62,32 +77,37 @@ const wrapEmailTemplate = (title, bodyHtml) => {
   `;
 };
 
-// Send Email Helper
+// Send Email Helper with race timeout (never hangs API requests)
 const sendEmail = async ({ to, subject, html, fallbackLogMessage, urlForDev }) => {
   const transporter = createTransporter();
   const from = `Mind Care Portal <${process.env.EMAIL_USER || 'no-reply@mindcare.edu'}>`;
 
   if (transporter) {
     try {
-      const info = await transporter.sendMail({ from, to, subject, html });
+      const sendPromise = transporter.sendMail({ from, to, subject, html });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('SMTP send timed out after 10 seconds')), 10000)
+      );
+
+      const info = await Promise.race([sendPromise, timeoutPromise]);
       console.log(`[Email Service] Sent "${subject}" to ${to} (MessageId: ${info.messageId})`);
       return info;
     } catch (err) {
-      console.error(`[Email Service Error] Failed to send email via Gmail SMTP:`, err.message);
+      console.error(`[Email Service Error] Failed to send email via SMTP:`, err.message);
       console.log(`[Email Service Dev Fallback] ${fallbackLogMessage}:`);
       console.log(`👉 Link: ${urlForDev}`);
       return null;
     }
   } else {
-    console.log(`[Email Service Dev Mode] No SMTP config found in .env. ${fallbackLogMessage}:`);
+    console.log(`[Email Service Dev Mode] No SMTP config found. ${fallbackLogMessage}:`);
     console.log(`👉 Link: ${urlForDev}`);
     return null;
   }
 };
 
 // 1. Send Email Verification
-const sendVerificationEmail = async (email, name, token) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:4200';
+const sendVerificationEmail = async (email, name, token, origin) => {
+  const clientUrl = origin || process.env.CLIENT_URL || 'http://localhost:4200';
   const verifyUrl = `${clientUrl}/verify-email?token=${token}`;
 
   const html = wrapEmailTemplate(
@@ -121,8 +141,8 @@ const sendVerificationEmail = async (email, name, token) => {
 };
 
 // 2. Send Password Reset Email
-const sendPasswordResetEmail = async (email, name, token) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:4200';
+const sendPasswordResetEmail = async (email, name, token, origin) => {
+  const clientUrl = origin || process.env.CLIENT_URL || 'http://localhost:4200';
   const resetUrl = `${clientUrl}/reset-password?token=${token}`;
 
   const html = wrapEmailTemplate(
@@ -156,8 +176,8 @@ const sendPasswordResetEmail = async (email, name, token) => {
 };
 
 // 3. Send Welcome Email (Post-verification)
-const sendWelcomeEmail = async (email, name) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:4200';
+const sendWelcomeEmail = async (email, name, origin) => {
+  const clientUrl = origin || process.env.CLIENT_URL || 'http://localhost:4200';
   const dashboardUrl = `${clientUrl}/dashboard`;
 
   const html = wrapEmailTemplate(
