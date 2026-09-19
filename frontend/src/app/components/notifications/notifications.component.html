@@ -1,0 +1,136 @@
+<div class="notifications-container container">
+  <div class="notif-header">
+    <h1>Notifications & Reminder Center</h1>
+    <p class="subtitle">Stay aligned with your emotional self-care routines through customizable notifications and gentle check-in reminders</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <div class="notif-layout grid-2">
+    <!-- Left Column: In-App Alerts List -->
+    <div class="glass-card notif-list-card">
+      <div class="card-header-flex">
+        <div class="title-with-count">
+          <h3>In-App Notifications</h3>
+          @if (unreadCount > 0) {
+            <span class="unread-pill">{{ unreadCount }} Unread</span>
+          }
+        </div>
+        @if (unreadCount > 0) {
+          <button (click)="markAllRead()" class="btn btn-outline btn-sm">Mark All Read</button>
+        }
+      </div>
+
+      @if (loading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading notifications...</p>
+        </div>
+      } @else if (notifications.length === 0) {
+        <div class="empty-state">
+          <span class="empty-bell">🔔</span>
+          <p>You have no notifications at this time.</p>
+        </div>
+      } @else {
+        <div class="notifs-scroll-list">
+          @for (n of notifications; track n._id) {
+            <div
+              class="notif-item"
+              [class.unread]="!n.read"
+              (click)="markRead(n)"
+            >
+              <div class="notif-icon-circle">
+                @if (n.type === 'mood') { 🌸 }
+                @else if (n.type === 'stress') { ⚡ }
+                @else if (n.type === 'journal') { ✍️ }
+                @else if (n.type === 'habit') { 🔥 }
+                @else { 🌿 }
+              </div>
+
+              <div class="notif-content">
+                <div class="notif-title-row">
+                  <h4>{{ n.title }}</h4>
+                  <span class="notif-time">{{ n.createdAt | date:'shortTime' }}</span>
+                </div>
+                <p class="notif-msg">{{ n.message }}</p>
+                <span class="notif-date">{{ n.createdAt | date:'mediumDate' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Right Column: Reminder Scheduling & Preferences -->
+    <div class="glass-card settings-card">
+      <h3>Automated Wellness Reminders</h3>
+      <p class="settings-sub">Customize which automated reminders you receive and choose your preferred daily check-in time.</p>
+
+      @if (settings) {
+        <form (ngSubmit)="savePreferences()" class="settings-form">
+          <div class="form-group time-group">
+            <label>Preferred Daily Reminder Time:</label>
+            <input
+              type="time"
+              [(ngModel)]="settings.reminderTime"
+              name="reminderTime"
+              class="form-control time-input"
+            />
+            <small class="hint">Nodemailer scheduler runs daily to alert you at your chosen hour.</small>
+          </div>
+
+          <div class="toggle-list">
+            <label class="toggle-item">
+              <input type="checkbox" [(ngModel)]="settings.moodReminder" name="moodReminder" />
+              <div class="toggle-text">
+                <strong>Daily Mood Check-in Reminder</strong>
+                <span>Gentle prompt in the evening to record emotional balance</span>
+              </div>
+            </label>
+
+            <label class="toggle-item">
+              <input type="checkbox" [(ngModel)]="settings.stressReminder" name="stressReminder" />
+              <div class="toggle-text">
+                <strong>Stress Assessment Reminder</strong>
+                <span>Weekly reflection check-in before exams and assignment deadlines</span>
+              </div>
+            </label>
+
+            <label class="toggle-item">
+              <input type="checkbox" [(ngModel)]="settings.journalReminder" name="journalReminder" />
+              <div class="toggle-text">
+                <strong>Private Journal Prompt</strong>
+                <span>Encouraging prompt to decompress and reflect on your day</span>
+              </div>
+            </label>
+
+            <label class="toggle-item">
+              <input type="checkbox" [(ngModel)]="settings.habitReminder" name="habitReminder" />
+              <div class="toggle-text">
+                <strong>Habit & Streak Notification</strong>
+                <span>Friendly reminder to maintain your active daily routines</span>
+              </div>
+            </label>
+
+            <label class="toggle-item">
+              <input type="checkbox" [(ngModel)]="settings.wellnessReminder" name="wellnessReminder" />
+              <div class="toggle-text">
+                <strong>General Self-Care & Breathing Tips</strong>
+                <span>Hydration, eye breaks, and 4-7-8 breathing recommendations</span>
+              </div>
+            </label>
+          </div>
+
+          <button type="submit" [disabled]="savingSettings" class="btn btn-primary btn-block">
+            {{ savingSettings ? 'Saving Settings...' : 'Save Notification Preferences' }}
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</div>

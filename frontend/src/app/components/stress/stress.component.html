@@ -1,0 +1,128 @@
+<div class="stress-container container">
+  <div class="stress-header">
+    <h1>Daily Stress Assessment</h1>
+    <p class="subtitle">A brief self-reflection framework to monitor academic pressure, cognitive fatigue, and emotional balance</p>
+  </div>
+
+  <!-- Mandatory Non-Clinical Notice -->
+  <div class="disclaimer-banner">
+    <span class="info-icon">ℹ️</span>
+    <div>
+      <strong>Wellness Indicator Notice:</strong>
+      This assessment is for general wellness awareness and is not a medical diagnosis. If you are experiencing acute distress, please reach out to professional counseling or emergency support.
+    </div>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Latest Assessment Summary Card (if available) -->
+  @if (latestAssessment) {
+    <div class="glass-card latest-card">
+      <div class="latest-header-flex">
+        <div>
+          <h3>Latest Assessment Result</h3>
+          <span class="latest-date">Assessed on: {{ latestAssessment.date }}</span>
+        </div>
+        <div class="level-badge" [class.badge-low]="latestAssessment.level === 'Low'" [class.badge-mod]="latestAssessment.level === 'Moderate'" [class.badge-high]="latestAssessment.level === 'High'">
+          {{ latestAssessment.level }} Stress ({{ latestAssessment.score }}/20)
+        </div>
+      </div>
+
+      <div class="recommendations-box">
+        <h4>Wellness Action Recommendations:</h4>
+        <ul>
+          @for (rec of latestAssessment.recommendations; track rec) {
+            <li>{{ rec }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- 5-Question Assessment Form -->
+  <div class="glass-card assessment-form-card">
+    <div class="assessment-intro">
+      <h2>Answer the following 5 questions honestly based on your past 24-48 hours:</h2>
+      <div class="live-score-pill">
+        Estimated Score: <strong>{{ currentCalculatedScore }}/20</strong> ({{ currentCalculatedLevel }})
+      </div>
+    </div>
+
+    <div class="questions-list">
+      @for (q of questions; track q.id; let qIdx = $index) {
+        <div class="question-item">
+          <div class="question-text">
+            <span class="q-number">0{{ q.id }}</span>
+            <p>{{ q.text }}</p>
+          </div>
+
+          <div class="options-row">
+            @for (opt of options; track opt.score) {
+              <button
+                type="button"
+                class="option-pill"
+                [class.selected]="q.selectedScore === opt.score"
+                (click)="selectScore(qIdx, opt.score)"
+              >
+                {{ opt.label }} ({{ opt.score }})
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="submit-box">
+      <button (click)="submitAssessment()" [disabled]="submitting" class="btn btn-primary btn-lg">
+        {{ submitting ? 'Calculating & Saving...' : 'Submit Stress Assessment' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Assessment History Section -->
+  <div class="past-history-section">
+    <h3>Previous Stress Assessments</h3>
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading assessment history...</p>
+      </div>
+    } @else if (pastAssessments.length === 0) {
+      <div class="empty-state glass-card">
+        <p>No prior stress assessments recorded yet. Complete the questions above to begin tracking your trends!</p>
+      </div>
+    } @else {
+      <div class="history-table-wrapper glass-card">
+        <table class="responsive-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total Score</th>
+              <th>Stress Level</th>
+              <th>Primary Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of pastAssessments; track item._id) {
+              <tr>
+                <td><strong>{{ item.date }}</strong></td>
+                <td>{{ item.score }} / 20</td>
+                <td>
+                  <span class="table-level-badge" [class.badge-low]="item.level === 'Low'" [class.badge-mod]="item.level === 'Moderate'" [class.badge-high]="item.level === 'High'">
+                    {{ item.level }}
+                  </span>
+                </td>
+                <td class="rec-cell">{{ item.recommendations[0] || 'Maintain healthy study rhythms' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

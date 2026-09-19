@@ -1,0 +1,385 @@
+<div class="admin-container container">
+  <div class="admin-header-flex">
+    <div>
+      <h1>Campus Administrator Console</h1>
+      <p class="subtitle">System content management, curated mental health resources, personalized wellness tips, and student account governance</p>
+    </div>
+    <div class="admin-privacy-pill">
+      🛡️ Strict Privacy Policy: Student Journals Excluded
+    </div>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Admin Navigation Tabs -->
+  <div class="admin-tabs">
+    <button class="tab-pill" [class.active]="activeTab === 'stats'" (click)="setTab('stats')">
+      📊 Portal Statistics
+    </button>
+    <button class="tab-pill" [class.active]="activeTab === 'tips'" (click)="setTab('tips')">
+      💡 Wellness Tips
+    </button>
+    <button class="tab-pill" [class.active]="activeTab === 'resources'" (click)="setTab('resources')">
+      📚 Resource Library
+    </button>
+    <button class="tab-pill" [class.active]="activeTab === 'meditation'" (click)="setTab('meditation')">
+      🧘 Meditation Audio
+    </button>
+    <button class="tab-pill" [class.active]="activeTab === 'users'" (click)="setTab('users')">
+      👥 Student Directory
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Loading administration data...</p>
+    </div>
+  } @else {
+    <!-- 1. Stats View -->
+    @if (activeTab === 'stats' && stats) {
+      <div class="stats-overview">
+        <div class="stats-grid grid-3">
+          <div class="glass-card metric-box">
+            <span class="box-icon">👨‍🎓</span>
+            <div>
+              <span class="box-label">Enrolled Students</span>
+              <h3>{{ stats.totalStudents }}</h3>
+            </div>
+          </div>
+
+          <div class="glass-card metric-box">
+            <span class="box-icon">💡</span>
+            <div>
+              <span class="box-label">Curated Wellness Tips</span>
+              <h3>{{ stats.totalTips }}</h3>
+            </div>
+          </div>
+
+          <div class="glass-card metric-box">
+            <span class="box-icon">📚</span>
+            <div>
+              <span class="box-label">Library Resources</span>
+              <h3>{{ stats.totalResources }}</h3>
+            </div>
+          </div>
+
+          <div class="glass-card metric-box">
+            <span class="box-icon">🧘</span>
+            <div>
+              <span class="box-label">Meditation Sessions</span>
+              <h3>{{ stats.totalMeditation }}</h3>
+            </div>
+          </div>
+
+          <div class="glass-card metric-box">
+            <span class="box-icon">⚡</span>
+            <div>
+              <span class="box-label">Assessments Taken</span>
+              <h3>{{ stats.totalAssessments }}</h3>
+            </div>
+          </div>
+
+          <div class="glass-card metric-box">
+            <span class="box-icon">🌸</span>
+            <div>
+              <span class="box-label">Mood Check-ins</span>
+              <h3>{{ stats.totalMoodEntries }}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card system-info-card">
+          <h4>Mind Care Portal System Status</h4>
+          <p>Database Engine: <strong>MongoDB Atlas (Connected)</strong></p>
+          <p>API Server: <strong>Node.js Express (Port 5000)</strong></p>
+          <p>Client Application: <strong>Angular 21 (Standalone Components)</strong></p>
+          <p>Privacy Protection: <strong>Student private journals isolated via authenticated JWT ownership checks.</strong></p>
+        </div>
+      </div>
+    }
+
+    <!-- 2. Tips Management View -->
+    @if (activeTab === 'tips') {
+      <div class="admin-section">
+        <div class="section-top">
+          <h3>Manage Wellness Recommendations</h3>
+          <button (click)="showTipForm = !showTipForm" class="btn btn-primary btn-sm">
+            {{ showTipForm ? 'Close Form' : '＋ Add New Tip' }}
+          </button>
+        </div>
+
+        @if (showTipForm) {
+          <div class="glass-card form-card">
+            <h4>{{ editingTipId ? 'Edit Wellness Tip' : 'Create New Wellness Tip' }}</h4>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" [(ngModel)]="tipForm.title" class="form-control" placeholder="e.g. 4-7-8 Breathing" />
+              </div>
+              <div class="form-group">
+                <label>Trigger Condition</label>
+                <select [(ngModel)]="tipForm.condition" class="form-control">
+                  @for (c of tipConditions; track c.value) {
+                    <option [value]="c.value">{{ c.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="tipForm.description" rows="2" class="form-control"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button (click)="saveTip()" class="btn btn-primary btn-sm">Save Tip</button>
+              <button (click)="cancelTipForm()" class="btn btn-outline btn-sm">Cancel</button>
+            </div>
+          </div>
+        }
+
+        <div class="table-card glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Trigger Condition</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of tips; track t._id) {
+                <tr>
+                  <td><strong>{{ t.title }}</strong></td>
+                  <td>{{ t.category }}</td>
+                  <td><span class="badge badge-teal">{{ t.condition }}</span></td>
+                  <td><span class="status-dot" [class.active]="t.active">{{ t.active ? 'Active' : 'Inactive' }}</span></td>
+                  <td>
+                    <button (click)="editTip(t)" class="btn-link">Edit</button>
+                    <button (click)="deleteTip(t._id)" class="btn-link delete-link">Delete</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- 3. Resources Management View -->
+    @if (activeTab === 'resources') {
+      <div class="admin-section">
+        <div class="section-top">
+          <h3>Manage Wellness Resource Library</h3>
+          <button (click)="showResourceForm = !showResourceForm" class="btn btn-primary btn-sm">
+            {{ showResourceForm ? 'Close Form' : '＋ Add New Resource' }}
+          </button>
+        </div>
+
+        @if (showResourceForm) {
+          <div class="glass-card form-card">
+            <h4>{{ editingResourceId ? 'Edit Resource' : 'Add New Resource' }}</h4>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Resource Title</label>
+                <input type="text" [(ngModel)]="resourceForm.title" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select [(ngModel)]="resourceForm.category" class="form-control">
+                  @for (cat of resourceCategories; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Resource URL</label>
+                <input type="url" [(ngModel)]="resourceForm.url" class="form-control" placeholder="https://..." />
+              </div>
+              <div class="form-group">
+                <label>Icon Emoji</label>
+                <input type="text" [(ngModel)]="resourceForm.icon" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="resourceForm.description" rows="2" class="form-control"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button (click)="saveResource()" class="btn btn-primary btn-sm">Save Resource</button>
+              <button (click)="cancelResourceForm()" class="btn btn-outline btn-sm">Cancel</button>
+            </div>
+          </div>
+        }
+
+        <div class="table-card glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>URL</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of resources; track r._id) {
+                <tr>
+                  <td><strong>{{ r.icon }} {{ r.title }}</strong></td>
+                  <td>{{ r.category }}</td>
+                  <td><a [href]="r.url" target="_blank" class="url-preview">Link ↗</a></td>
+                  <td><span class="status-dot" [class.active]="r.active">{{ r.active ? 'Active' : 'Inactive' }}</span></td>
+                  <td>
+                    <button (click)="editResource(r)" class="btn-link">Edit</button>
+                    <button (click)="deleteResource(r._id)" class="btn-link delete-link">Delete</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- 4. Meditation Audio Guides Management View -->
+    @if (activeTab === 'meditation') {
+      <div class="admin-section">
+        <div class="section-top">
+          <h3>Manage Meditation Guides</h3>
+          <button (click)="showMeditationForm = !showMeditationForm" class="btn btn-primary btn-sm">
+            {{ showMeditationForm ? 'Close Form' : '＋ Add Meditation' }}
+          </button>
+        </div>
+
+        @if (showMeditationForm) {
+          <div class="glass-card form-card">
+            <h4>{{ editingMeditationId ? 'Edit Meditation' : 'Create Meditation Guide' }}</h4>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" [(ngModel)]="meditationForm.title" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select [(ngModel)]="meditationForm.category" class="form-control">
+                  @for (mc of meditationCategories; track mc) {
+                    <option [value]="mc">{{ mc }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Duration (Mins)</label>
+                <input type="number" [(ngModel)]="meditationForm.duration" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Audio / YouTube Stream URL</label>
+              <input type="url" [(ngModel)]="meditationForm.url" class="form-control" />
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="meditationForm.description" rows="2" class="form-control"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button (click)="saveMeditation()" class="btn btn-primary btn-sm">Save Meditation</button>
+              <button (click)="cancelMeditationForm()" class="btn btn-outline btn-sm">Cancel</button>
+            </div>
+          </div>
+        }
+
+        <div class="table-card glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of meditationGuides; track m._id) {
+                <tr>
+                  <td><strong>{{ m.title }}</strong></td>
+                  <td>{{ m.category }}</td>
+                  <td>{{ m.duration }} Mins</td>
+                  <td><span class="status-dot" [class.active]="m.active">{{ m.active ? 'Active' : 'Inactive' }}</span></td>
+                  <td>
+                    <button (click)="editMeditation(m)" class="btn-link">Edit</button>
+                    <button (click)="deleteMeditation(m._id)" class="btn-link delete-link">Delete</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- 5. Users List View -->
+    @if (activeTab === 'users') {
+      <div class="admin-section">
+        <h3>Student Accounts Directory</h3>
+        <p class="section-sub">Govern user activation status and verify account creation dates.</p>
+
+        <div class="table-card glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created Date</th>
+                <th>Account Status</th>
+                <th>Toggle Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (u of users; track u._id) {
+                <tr>
+                  <td><strong>{{ u.name }}</strong></td>
+                  <td>{{ u.email }}</td>
+                  <td><span class="badge badge-teal">{{ u.role | uppercase }}</span></td>
+                  <td>{{ u.createdAt | date:'mediumDate' }}</td>
+                  <td>
+                    <span class="status-dot" [class.active]="u.isActive">
+                      {{ u.isActive ? 'Active' : 'Deactivated' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      (click)="toggleUser(u)"
+                      class="btn btn-sm"
+                      [class.btn-outline]="u.isActive"
+                      [class.btn-primary]="!u.isActive"
+                    >
+                      {{ u.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

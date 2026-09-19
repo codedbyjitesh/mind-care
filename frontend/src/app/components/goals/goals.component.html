@@ -1,0 +1,183 @@
+<div class="goals-container container">
+  <div class="goals-header-flex">
+    <div>
+      <h1>Wellness Goals</h1>
+      <p class="subtitle">Set intentional milestones for emotional resilience, academic-life balance, sleep routines, and self-care</p>
+    </div>
+    <button (click)="showForm = !showForm" class="btn btn-primary">
+      {{ showForm ? 'Close Form' : '＋ Set New Goal' }}
+    </button>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Stats Grid -->
+  @if (goalData?.stats) {
+    <div class="stats-grid grid-4">
+      <div class="glass-card stat-card">
+        <span class="stat-icon">🎯</span>
+        <div>
+          <span class="stat-label">Total Goals</span>
+          <h3>{{ goalData?.stats?.total }} Goals</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">⚡</span>
+        <div>
+          <span class="stat-label">In Progress</span>
+          <h3>{{ goalData?.stats?.active }} Active</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">🏆</span>
+        <div>
+          <span class="stat-label">Accomplished</span>
+          <h3>{{ goalData?.stats?.completed }} Completed</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">📊</span>
+        <div>
+          <span class="stat-label">Avg. Progress</span>
+          <h3>{{ goalData?.stats?.avgProgress }}%</h3>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add / Edit Goal Form -->
+  @if (showForm) {
+    <div class="glass-card goal-form-card">
+      <h3>{{ isEditing ? 'Edit Goal' : 'Define a New Wellness Objective' }}</h3>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Goal Title</label>
+          <input
+            type="text"
+            [(ngModel)]="title"
+            placeholder="e.g. Maintain 7+ hrs sleep for 14 straight days, daily 10m breathing..."
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Target Completion Date</label>
+          <input type="date" [(ngModel)]="targetDate" class="form-control" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description & Action Plan</label>
+        <textarea
+          [(ngModel)]="description"
+          rows="2"
+          placeholder="What specific actions will help you reach this milestone?"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Current Progress: {{ progress }}%</label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            [(ngModel)]="progress"
+            class="range-slider"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Goal Status</label>
+          <select [(ngModel)]="status" class="form-control">
+            <option value="Active">Active</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button (click)="saveGoal()" [disabled]="submitting" class="btn btn-primary">
+          {{ submitting ? 'Saving...' : (isEditing ? 'Update Goal' : 'Create Goal') }}
+        </button>
+        <button (click)="cancelForm()" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Goals List -->
+  <div class="goals-list-section">
+    <h3>Active Objectives & Milestones</h3>
+
+    @if (loading) {
+      <div class="loading-state glass-card">
+        <div class="spinner"></div>
+        <p>Loading your wellness goals...</p>
+      </div>
+    } @else if (!goalData?.goals || goalData?.goals?.length === 0) {
+      <div class="empty-state glass-card">
+        <span class="empty-emoji">🎯</span>
+        <h4>No goals defined yet</h4>
+        <p>Empower your wellness by defining clear milestones for rest, physical movement, and mindful focus.</p>
+        <button (click)="showForm = true" class="btn btn-primary">Create Your First Goal</button>
+      </div>
+    } @else {
+      <div class="goals-grid">
+        @for (g of goalData?.goals; track g._id) {
+          <div class="glass-card goal-card" [class.completed-card]="g.status === 'Completed'">
+            <div class="goal-card-top">
+              <span class="status-chip" [class.chip-active]="g.status === 'Active'" [class.chip-done]="g.status === 'Completed'" [class.chip-cancel]="g.status === 'Cancelled'">
+                {{ g.status }}
+              </span>
+              <span class="target-date">Target: {{ g.targetDate }}</span>
+            </div>
+
+            <h4>{{ g.title }}</h4>
+            <p class="goal-desc">{{ g.description || 'No additional notes provided.' }}</p>
+
+            <!-- Progress Bar -->
+            <div class="progress-wrapper">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width.%]="g.progress"></div>
+              </div>
+              <div class="progress-text-flex">
+                <span>Progress</span>
+                <strong>{{ g.progress }}%</strong>
+              </div>
+            </div>
+
+            <!-- Quick Progress Increment Buttons -->
+            @if (g.status === 'Active') {
+              <div class="quick-step-buttons">
+                <button (click)="updateProgressQuick(g, 10)" class="step-btn">+10%</button>
+                <button (click)="updateProgressQuick(g, 25)" class="step-btn">+25%</button>
+                <button (click)="markCompleted(g)" class="step-btn complete-btn">Mark Done ✓</button>
+              </div>
+            }
+
+            <div class="goal-card-bottom">
+              <span class="start-date">Started: {{ g.startDate }}</span>
+              <div class="actions">
+                <button (click)="startEdit(g)" class="btn-text edit-btn">Edit</button>
+                <button (click)="deleteGoal(g._id)" class="btn-text delete-btn">Delete</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

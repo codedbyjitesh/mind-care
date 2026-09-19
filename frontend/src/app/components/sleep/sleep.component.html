@@ -1,0 +1,167 @@
+<div class="sleep-container container">
+  <div class="sleep-header">
+    <h1>Sleep Tracker</h1>
+    <p class="subtitle">Monitor your circadian cycles, sleep duration, and restfulness quality to optimize academic cognitive recovery</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Weekly Sleep Summary Cards -->
+  @if (sleepData?.summary) {
+    <div class="summary-grid grid-3">
+      <div class="glass-card summary-card">
+        <span class="summary-icon">🌙</span>
+        <div>
+          <span class="summary-label">Average Sleep</span>
+          <h3>{{ sleepData?.summary?.avgDuration }} Hours</h3>
+        </div>
+      </div>
+
+      <div class="glass-card summary-card">
+        <span class="summary-icon">🎯</span>
+        <div>
+          <span class="summary-label">Target Sleep</span>
+          <h3>{{ sleepData?.summary?.targetDuration }} Hours / Night</h3>
+        </div>
+      </div>
+
+      <div class="glass-card summary-card">
+        <span class="summary-icon">📊</span>
+        <div>
+          <span class="summary-label">Total Logs</span>
+          <h3>{{ sleepData?.summary?.totalRecords }} Recorded</h3>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add/Edit Sleep Form Card -->
+  <div class="glass-card form-card">
+    <div class="form-header-flex">
+      <h2>{{ isEditing ? 'Edit Sleep Entry' : 'Log Last Night’s Sleep' }}</h2>
+      <span class="duration-highlight">Duration: {{ duration }} hrs</span>
+    </div>
+
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label>Date of Rest</label>
+        <input type="date" [(ngModel)]="date" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label>Sleep Time (Went to Bed)</label>
+        <input
+          type="time"
+          [(ngModel)]="sleepTime"
+          (change)="calculateDuration()"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Wake Time (Woke Up)</label>
+        <input
+          type="time"
+          [(ngModel)]="wakeTime"
+          (change)="calculateDuration()"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <!-- Sleep Quality Selector -->
+    <div class="quality-selector-group">
+      <label>Rest Quality Rating:</label>
+      <div class="quality-pills">
+        @for (q of qualities; track q) {
+          <button
+            type="button"
+            class="quality-pill"
+            [class.selected]="quality === q"
+            (click)="quality = $any(q)"
+          >
+            {{ q }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Sleep Environment / Night Notes (Optional):</label>
+      <input
+        type="text"
+        [(ngModel)]="note"
+        placeholder="e.g. Studied until late, room was quiet, dreamed clearly, woke up energized..."
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-actions">
+      <button (click)="saveSleep()" [disabled]="submitting" class="btn btn-primary">
+        {{ submitting ? 'Saving...' : (isEditing ? 'Update Sleep Record' : 'Save Sleep Entry') }}
+      </button>
+      @if (isEditing) {
+        <button (click)="cancelEdit()" class="btn btn-outline">Cancel Edit</button>
+      }
+    </div>
+  </div>
+
+  <!-- Sleep Records History Table -->
+  <div class="sleep-history-section">
+    <h3>Sleep History Log</h3>
+
+    @if (loading) {
+      <div class="loading-state glass-card">
+        <div class="spinner"></div>
+        <p>Loading sleep records...</p>
+      </div>
+    } @else if (!sleepData?.entries || sleepData?.entries?.length === 0) {
+      <div class="empty-state glass-card">
+        <p>No sleep logs recorded yet. Add your sleep and wake times above to begin analyzing your rest patterns.</p>
+      </div>
+    } @else {
+      <div class="history-table-wrapper glass-card">
+        <table class="responsive-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Bedtime</th>
+              <th>Wake Time</th>
+              <th>Duration</th>
+              <th>Quality</th>
+              <th>Note</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of sleepData?.entries; track item._id) {
+              <tr>
+                <td><strong>{{ item.date }}</strong></td>
+                <td>{{ item.sleepTime }}</td>
+                <td>{{ item.wakeTime }}</td>
+                <td>
+                  <span class="duration-badge" [class.optimal]="item.duration >= 7 && item.duration <= 9">
+                    {{ item.duration }} hrs
+                  </span>
+                </td>
+                <td>
+                  <span class="quality-tag">{{ item.quality }}</span>
+                </td>
+                <td class="note-cell">{{ item.note || '—' }}</td>
+                <td>
+                  <button (click)="startEdit(item)" class="action-btn edit-btn">Edit</button>
+                  <button (click)="deleteEntry(item._id)" class="action-btn delete-btn">Delete</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

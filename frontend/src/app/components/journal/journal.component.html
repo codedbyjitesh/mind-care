@@ -1,0 +1,151 @@
+<div class="journal-container container">
+  <div class="journal-header-flex">
+    <div>
+      <h1>Personal Journal</h1>
+      <p class="subtitle">A safe, encrypted, private sanctuary for your daily thoughts, reflections, and emotional release</p>
+    </div>
+    <div class="privacy-guarantee-pill">
+      🔒 100% Student Private & Isolated
+    </div>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Write / Edit Mode -->
+  @if (isWriting) {
+    <div class="glass-card editor-card">
+      <div class="editor-header">
+        <h2>{{ editingId ? 'Edit Journal Entry' : 'Write in Your Journal' }}</h2>
+        <span class="editor-date">📅 {{ date }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Entry Title</label>
+        <input
+          type="text"
+          [(ngModel)]="title"
+          placeholder="e.g. Navigating project stress, reflections on today's breakthrough..."
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Associated Mood (Optional)</label>
+          <select [(ngModel)]="mood" class="form-control">
+            <option value="">-- No Mood Attached --</option>
+            @for (m of moodList; track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="date" class="form-control" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Journal Content (Free Reflection)</label>
+        <textarea
+          [(ngModel)]="content"
+          rows="10"
+          placeholder="Write freely. Express your emotions, challenges, victories, or what is heavy on your mind today..."
+          class="form-control content-textarea"
+          required
+        ></textarea>
+      </div>
+
+      <div class="editor-actions">
+        <button (click)="saveJournal()" [disabled]="saving" class="btn btn-primary">
+          {{ saving ? 'Encrypting & Saving...' : 'Save Journal Entry' }}
+        </button>
+        <button (click)="cancelEditor()" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Read Single Journal Modal/View -->
+  @if (selectedJournal && !isWriting) {
+    <div class="glass-card read-card">
+      <div class="read-top">
+        <div>
+          <h2>{{ selectedJournal.title }}</h2>
+          <span class="read-date">📅 {{ selectedJournal.date }}</span>
+          @if (selectedJournal.mood) {
+            <span class="badge badge-teal mood-tag">{{ selectedJournal.mood }}</span>
+          }
+        </div>
+        <div class="read-actions">
+          <button (click)="editJournal(selectedJournal)" class="btn btn-secondary btn-sm">✏️ Edit</button>
+          <button (click)="deleteJournal(selectedJournal._id)" class="btn btn-outline btn-sm delete-text">🗑️ Delete</button>
+          <button (click)="selectedJournal = null" class="btn btn-outline btn-sm">Back to List</button>
+        </div>
+      </div>
+
+      <div class="read-body">
+        <p>{{ selectedJournal.content }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Journal List & Search Controls -->
+  @if (!isWriting) {
+    <div class="list-controls-bar glass-card">
+      <div class="search-inputs">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="search()"
+          placeholder="Search by keywords or title..."
+          class="form-control search-field"
+        />
+        <input type="date" [(ngModel)]="filterDate" class="form-control date-field" />
+        <button (click)="search()" class="btn btn-secondary btn-sm">Search</button>
+        <button (click)="clearSearch()" class="btn btn-outline btn-sm">Reset</button>
+      </div>
+      <button (click)="openNewEditor()" class="btn btn-primary">
+        ✍️ New Journal Entry
+      </button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your private journal reflections...</p>
+      </div>
+    } @else if (journals.length === 0) {
+      <div class="empty-state glass-card">
+        <span class="empty-book">📖</span>
+        <h3>Your journal is a blank canvas</h3>
+        <p>No journal entries match your query. Write your first reflection today to unlock clarity and emotional lightness.</p>
+        <button (click)="openNewEditor()" class="btn btn-primary">Start Writing Now</button>
+      </div>
+    } @else {
+      <div class="journal-grid">
+        @for (j of journals; track j._id) {
+          <div class="glass-card journal-item-card" (click)="viewJournal(j)">
+            <div class="item-card-header">
+              <h4>{{ j.title }}</h4>
+              <span class="item-date">{{ j.date }}</span>
+            </div>
+            <p class="snippet">{{ j.content | slice:0:140 }}...</p>
+            <div class="item-card-footer">
+              @if (j.mood) {
+                <span class="badge badge-teal">{{ j.mood }}</span>
+              }
+              <span class="read-more-link">Read Full Entry →</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

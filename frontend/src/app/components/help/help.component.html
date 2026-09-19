@@ -1,0 +1,105 @@
+<div class="help-container container">
+  <!-- Prominent Emergency Alert Banner -->
+  <div class="emergency-hero-banner">
+    <div class="hero-icon">🚨</div>
+    <div class="hero-content">
+      <h2>Immediate Crisis Guidance</h2>
+      <p class="critical-text">
+        If you or someone you know is in immediate danger of self-harm or experiencing a severe psychological crisis, please contact your local emergency services (dial <strong>112</strong> in India, or your local emergency number) or proceed to the nearest hospital emergency room immediately.
+      </p>
+      <div class="mandatory-disclaimer">
+        <strong>Important Medical Notice:</strong>
+        "Mind Care is not a replacement for professional medical or psychological care."
+      </div>
+    </div>
+  </div>
+
+  <div class="help-header">
+    <h1>Help & Support Resources</h1>
+    <p class="subtitle">Direct access to verified national tele-mental health helplines, student counseling services, and crisis intervention specialists</p>
+  </div>
+
+  <!-- Verified Helplines Grid -->
+  <div class="helplines-section">
+    <h3>Trusted Emergency & Support Helplines</h3>
+    <div class="helplines-grid">
+      @for (h of helplines; track h.name) {
+        <div class="glass-card helpline-card">
+          <div class="card-top">
+            <span class="badge" [class.badge-danger]="h.badge === 'Immediate Danger'" [class.badge-teal]="h.badge !== 'Immediate Danger'">
+              {{ h.badge }}
+            </span>
+            <span class="avail-tag">{{ h.availability }}</span>
+          </div>
+
+          <h4>{{ h.name }}</h4>
+          <p class="h-desc">{{ h.description }}</p>
+
+          <div class="phone-call-box">
+            <span class="phone-label">Toll-Free / Dial:</span>
+            <a [href]="'tel:' + h.phone" class="phone-number">{{ h.phone }}</a>
+          </div>
+
+          @if (h.website) {
+            <a [href]="h.website" target="_blank" rel="noopener noreferrer" class="web-link">
+              Visit Official Website ↗
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- When to Seek Professional Care Guidelines -->
+  <div class="guidance-layout grid-2">
+    <div class="glass-card guidance-card">
+      <div class="card-title-row">
+        <span class="icon">🩺</span>
+        <h3>When to Seek Professional Help</h3>
+      </div>
+      <p class="guide-intro">
+        Everyone experiences stress during exam sessions, but clinical counseling should be pursued when emotional distress interferes with your day-to-day functionality:
+      </p>
+      <ul class="signs-list">
+        @for (sign of warningSigns; track sign) {
+          <li>{{ sign }}</li>
+        }
+      </ul>
+    </div>
+
+    <div class="glass-card action-card">
+      <div class="card-title-row">
+        <span class="icon">🤝</span>
+        <h3>How to Reach Out to Campus Support</h3>
+      </div>
+      <p class="guide-intro">
+        Most university campuses have dedicated student welfare counselors. If you feel hesitant to talk, consider these practical steps:
+      </p>
+      <div class="steps-list">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Confide in a Trusted Friend or Faculty Member</strong>
+            <p>Sharing your feelings out loud breaks the cycle of rumination.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Visit Your University Wellness Center</strong>
+            <p>Campus counselors provide confidential, student-tailored sessions without academic penalty.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Use the 24/7 Tele-MANAS Service (14416)</strong>
+            <p>Completely free, anonymous, and accessible anytime day or night.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

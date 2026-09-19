@@ -39,10 +39,30 @@ const userSchema = new mongoose.Schema(
     emailVerificationExpires: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    bio: {
+      type: String,
+      default: ''
+    },
+    studentId: {
+      type: String,
+      default: ''
+    },
+    phone: {
+      type: String,
+      default: ''
+    },
     emailNotifications: {
       moodReminder: { type: Boolean, default: true },
+      stressReminder: { type: Boolean, default: true },
       journalReminder: { type: Boolean, default: true },
-      meditationReminder: { type: Boolean, default: true }
+      habitReminder: { type: Boolean, default: true },
+      meditationReminder: { type: Boolean, default: true },
+      wellnessReminder: { type: Boolean, default: true },
+      reminderTime: { type: String, default: '20:00' }
     }
   },
   {

@@ -1,0 +1,97 @@
+<div class="analytics-container container">
+  <div class="analytics-header">
+    <h1>Wellness Analytics & Visual Trends</h1>
+    <p class="subtitle">Interactive longitudinal charts tracking your emotional balance, stress levels, sleep hygiene, and habit consistency</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Generating wellness visual charts...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  } @else if (analytics) {
+    <!-- Quick Metrics Top Row -->
+    <div class="metrics-grid grid-4">
+      <div class="glass-card metric-card">
+        <span class="metric-icon">🙂</span>
+        <div class="metric-details">
+          <span class="metric-label">Average Mood</span>
+          <h3>{{ analytics.stats.avgMood }} / 5</h3>
+        </div>
+      </div>
+
+      <div class="glass-card metric-card">
+        <span class="metric-icon">⚡</span>
+        <div class="metric-details">
+          <span class="metric-label">Average Stress</span>
+          <h3>{{ analytics.stats.avgStress }} / 20</h3>
+        </div>
+      </div>
+
+      <div class="glass-card metric-card">
+        <span class="metric-icon">🌙</span>
+        <div class="metric-details">
+          <span class="metric-label">Average Sleep</span>
+          <h3>{{ analytics.stats.avgSleep }} hrs</h3>
+        </div>
+      </div>
+
+      <div class="glass-card metric-card">
+        <span class="metric-icon">🎯</span>
+        <div class="metric-details">
+          <span class="metric-label">Habit Consistency</span>
+          <h3>{{ analytics.stats.habitCompletionRate }}%</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Responsive Charts Grid -->
+    <div class="charts-grid grid-2">
+      <!-- 1. Mood Trend Chart -->
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3>Mood Trajectory (Last 7 Days)</h3>
+          <span class="chart-tag tag-teal">Daily Score 1-5</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas #moodCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- 2. Stress Score Chart -->
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3>Academic Stress Levels</h3>
+          <span class="chart-tag tag-red">0-20 Scale</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas #stressCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- 3. Sleep Trend Chart -->
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3>Sleep Duration Trends</h3>
+          <span class="chart-tag tag-blue">Hours Logged</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas #sleepCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- 4. Habit Consistency Chart -->
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3>Habit Completion Rate</h3>
+          <span class="chart-tag tag-green">% Daily Success</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas #habitCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,167 @@
+<div class="habits-container container">
+  <div class="habits-header-flex">
+    <div>
+      <h1>Habit & Routine Tracker</h1>
+      <p class="subtitle">Build consistent positive student micro-habits, nurture daily discipline, and track consecutive streaks</p>
+    </div>
+    <button (click)="showForm = !showForm" class="btn btn-primary">
+      {{ showForm ? 'Close Form' : '＋ Add New Habit' }}
+    </button>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Habit Statistics Row -->
+  @if (habitData?.statistics) {
+    <div class="stats-grid grid-4">
+      <div class="glass-card stat-card">
+        <span class="stat-icon">📋</span>
+        <div>
+          <span class="stat-label">Active Habits</span>
+          <h3>{{ habitData?.statistics?.active }} Habits</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">✅</span>
+        <div>
+          <span class="stat-label">Completed Today</span>
+          <h3>{{ habitData?.statistics?.completedToday }} / {{ habitData?.statistics?.active }}</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">📈</span>
+        <div>
+          <span class="stat-label">Today's Progress</span>
+          <h3>{{ habitData?.statistics?.completionRate }}%</h3>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card">
+        <span class="stat-icon">🔥</span>
+        <div>
+          <span class="stat-label">Consistency</span>
+          <h3>Steady Pace</h3>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add/Edit Habit Form -->
+  @if (showForm) {
+    <div class="glass-card habit-form-card">
+      <h3>{{ isEditing ? 'Edit Habit' : 'Create a New Wellness Habit' }}</h3>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Habit Title</label>
+          <input
+            type="text"
+            [(ngModel)]="title"
+            placeholder="e.g. 20-minute evening walk, drinking water, study break stretching..."
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Tracking Frequency</label>
+          <select [(ngModel)]="frequency" class="form-control">
+            <option value="Daily">Daily</option>
+            <option value="Weekly">Weekly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description & Purpose</label>
+        <input
+          type="text"
+          [(ngModel)]="description"
+          placeholder="Why does this habit matter to your mental wellness?"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="suggestions-bar">
+        <span class="sugg-label">Quick Suggestions:</span>
+        @for (s of suggestedHabits; track s.title) {
+          <button type="button" (click)="applySuggestion(s)" class="sugg-chip">
+            + {{ s.title }}
+          </button>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button (click)="saveHabit()" [disabled]="submitting" class="btn btn-primary">
+          {{ submitting ? 'Saving...' : (isEditing ? 'Update Habit' : 'Save Habit') }}
+        </button>
+        <button (click)="cancelForm()" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Habits List Cards -->
+  <div class="habits-list-section">
+    <h3>Today's Routine Check-in</h3>
+
+    @if (loading) {
+      <div class="loading-state glass-card">
+        <div class="spinner"></div>
+        <p>Loading your wellness habits...</p>
+      </div>
+    } @else if (!habitData?.habits || habitData?.habits?.length === 0) {
+      <div class="empty-state glass-card">
+        <span class="empty-emoji">🌱</span>
+        <h4>No habits created yet</h4>
+        <p>Start small! Create your first daily habit like hydration or breathing exercises to build momentum.</p>
+        <button (click)="showForm = true" class="btn btn-primary">Create First Habit</button>
+      </div>
+    } @else {
+      <div class="habits-grid">
+        @for (h of habitData?.habits; track h._id) {
+          <div class="glass-card habit-card" [class.done-today]="h.isCompletedToday">
+            <div class="habit-card-top">
+              <button
+                type="button"
+                class="check-circle"
+                [class.checked]="h.isCompletedToday"
+                (click)="toggleComplete(h)"
+                title="Click to toggle today's completion"
+              >
+                {{ h.isCompletedToday ? '✓' : '' }}
+              </button>
+
+              <div class="habit-title-area">
+                <h4 [class.strike]="h.isCompletedToday">{{ h.title }}</h4>
+                <p class="habit-desc">{{ h.description || 'No description added.' }}</p>
+              </div>
+
+              <div class="streak-badge">
+                <span class="fire-icon">🔥</span>
+                <span class="streak-num">{{ h.streak }}</span>
+                <span class="streak-label">Day Streak</span>
+              </div>
+            </div>
+
+            <div class="habit-card-bottom">
+              <span class="freq-tag">{{ h.frequency }}</span>
+              <span class="total-days">Total completed: {{ h.totalCompletedDays || 0 }} times</span>
+              <div class="actions">
+                <button (click)="startEdit(h)" class="btn-text edit-btn">Edit</button>
+                <button (click)="deleteHabit(h._id)" class="btn-text delete-btn">Delete</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<div class="history-container container">
+  <div class="history-top-bar">
+    <div>
+      <h1>Mood & Stress History</h1>
+      <p class="subtitle">Understand your personal emotional patterns, academic triggers, and long-term wellness trajectories</p>
+    </div>
+
+    <!-- Timeline Period Filter Buttons -->
+    <div class="period-filter-group">
+      <button
+        class="filter-pill"
+        [class.active]="activeFilter === 'all'"
+        (click)="setFilter('all')"
+      >
+        All Time
+      </button>
+      <button
+        class="filter-pill"
+        [class.active]="activeFilter === 'weekly'"
+        (click)="setFilter('weekly')"
+      >
+        Past 7 Days
+      </button>
+      <button
+        class="filter-pill"
+        [class.active]="activeFilter === 'monthly'"
+        (click)="setFilter('monthly')"
+      >
+        Past 30 Days
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab selector: All / Moods / Stress -->
+  <div class="tab-buttons">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">
+      Combined Timeline
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'moods'" (click)="setTab('moods')">
+      Mood Records ({{ historyData?.pagination?.totalMoods || 0 }})
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'stress'" (click)="setTab('stress')">
+      Stress Assessments ({{ historyData?.pagination?.totalStress || 0 }})
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Loading historical records...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  } @else {
+    <!-- Mood Section -->
+    @if (activeTab === 'all' || activeTab === 'moods') {
+      <div class="section-card glass-card">
+        <h3>Daily Mood Timeline</h3>
+        @if (!historyData?.moods || historyData?.moods?.length === 0) {
+          <p class="empty-msg">No mood logs recorded during this selected timeframe.</p>
+        } @else {
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Mood</th>
+                  <th>Score</th>
+                  <th>Reflective Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of historyData?.moods; track m._id) {
+                  <tr>
+                    <td><strong>{{ m.date }}</strong></td>
+                    <td>
+                      <span class="mood-cell">{{ getMoodEmoji(m.mood) }} {{ m.mood }}</span>
+                    </td>
+                    <td>
+                      <span class="score-pill">{{ m.score }} / 5</span>
+                    </td>
+                    <td class="note-col">{{ m.note || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Stress Section -->
+    @if (activeTab === 'all' || activeTab === 'stress') {
+      <div class="section-card glass-card">
+        <h3>Stress Assessment Timeline</h3>
+        @if (!historyData?.stress || historyData?.stress?.length === 0) {
+          <p class="empty-msg">No stress assessments recorded during this selected timeframe.</p>
+        } @else {
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Total Score</th>
+                  <th>Level</th>
+                  <th>Key Wellness Suggestion</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of historyData?.stress; track s._id) {
+                  <tr>
+                    <td><strong>{{ s.date }}</strong></td>
+                    <td>{{ s.score }} / 20</td>
+                    <td>
+                      <span class="level-pill" [class.badge-low]="s.level === 'Low'" [class.badge-mod]="s.level === 'Moderate'" [class.badge-high]="s.level === 'High'">
+                        {{ s.level }}
+                      </span>
+                    </td>
+                    <td class="rec-col">{{ s.recommendations[0] || 'Maintain healthy study rhythms' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Pagination Controls -->
+    <div class="pagination-bar">
+      <button (click)="prevPage()" [disabled]="page === 1" class="btn btn-outline btn-sm">
+        ← Previous Page
+      </button>
+      <span class="page-indicator">Page {{ page }}</span>
+      <button (click)="nextPage()" [disabled]="(historyData?.moods?.length || 0) < limit && (historyData?.stress?.length || 0) < limit" class="btn btn-outline btn-sm">
+        Next Page →
+      </button>
+    </div>
+  }
+</div>

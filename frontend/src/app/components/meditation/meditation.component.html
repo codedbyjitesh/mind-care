@@ -1,0 +1,137 @@
+<div class="meditation-container container">
+  <div class="meditation-header">
+    <h1>Meditation & Breathing Exercises</h1>
+    <p class="subtitle">Regulate your autonomic nervous system with rhythmic box breathing and guided student meditation sessions</p>
+  </div>
+
+  <!-- Interactive Breathing Timer Section -->
+  <div class="glass-card breathing-card">
+    <div class="card-top-flex">
+      <div>
+        <h2>Sama Vritti (Box Breathing Timer)</h2>
+        <p class="method-sub">Inhale (4s) → Hold (4s) → Exhale (4s) → Rest (4s)</p>
+      </div>
+
+      <!-- Duration Selector Buttons -->
+      <div class="duration-buttons">
+        <button
+          type="button"
+          class="duration-pill"
+          [class.active]="selectedTotalMinutes === 1"
+          [disabled]="isRunning"
+          (click)="setDuration(1)"
+        >
+          1 Min
+        </button>
+        <button
+          type="button"
+          class="duration-pill"
+          [class.active]="selectedTotalMinutes === 2"
+          [disabled]="isRunning"
+          (click)="setDuration(2)"
+        >
+          2 Mins
+        </button>
+        <button
+          type="button"
+          class="duration-pill"
+          [class.active]="selectedTotalMinutes === 5"
+          [disabled]="isRunning"
+          (click)="setDuration(5)"
+        >
+          5 Mins
+        </button>
+      </div>
+    </div>
+
+    <!-- Animated Breathing Circle -->
+    <div class="breathing-arena">
+      <div
+        class="outer-aura"
+        [class.inhale]="isRunning && !isPaused && currentPhase === 'Inhale'"
+        [class.hold]="isRunning && !isPaused && (currentPhase === 'Hold' || currentPhase === 'Rest')"
+        [class.exhale]="isRunning && !isPaused && currentPhase === 'Exhale'"
+      >
+        <div class="inner-circle">
+          <span class="phase-name">{{ isRunning ? currentPhase : 'Ready' }}</span>
+          <span class="countdown-num">{{ isRunning ? phaseCountdown : selectedTotalMinutes + ':00' }}</span>
+          <span class="total-left">Session: {{ formattedTotalTime }}</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="phase-guide">{{ isRunning ? phaseInstruction : 'Press Start to begin guided rhythmic breathing' }}</p>
+
+    <!-- Timer Controls -->
+    <div class="timer-controls">
+      @if (!isRunning) {
+        <button (click)="startTimer()" class="btn btn-primary btn-lg">
+          ▶ Start Breathing
+        </button>
+      } @else if (isPaused) {
+        <button (click)="resumeTimer()" class="btn btn-primary btn-lg">
+          ▶ Resume
+        </button>
+        <button (click)="resetTimer()" class="btn btn-outline btn-lg">
+          ⏹ Reset
+        </button>
+      } @else {
+        <button (click)="pauseTimer()" class="btn btn-secondary btn-lg">
+          ⏸ Pause
+        </button>
+        <button (click)="resetTimer()" class="btn btn-outline btn-lg">
+          ⏹ Reset
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Meditation Guides Library -->
+  <div class="guides-section">
+    <div class="guides-header-flex">
+      <h3>Guided Meditation Library</h3>
+      
+      <!-- Category Filter Pills -->
+      <div class="category-pills">
+        @for (cat of categories; track cat) {
+          <button
+            class="cat-pill"
+            [class.active]="selectedCategory === cat"
+            (click)="filterGuides(cat)"
+          >
+            {{ cat }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (loadingGuides) {
+      <div class="loading-state glass-card">
+        <div class="spinner"></div>
+        <p>Loading meditation guides...</p>
+      </div>
+    } @else if (meditationGuides.length === 0) {
+      <div class="empty-state glass-card">
+        <p>No guides found for this category.</p>
+      </div>
+    } @else {
+      <div class="guides-grid">
+        @for (guide of meditationGuides; track guide._id) {
+          <div class="glass-card guide-card">
+            <div class="guide-top">
+              <span class="guide-cat-badge">{{ guide.category }}</span>
+              <span class="guide-duration">⏱ {{ guide.duration }} Mins</span>
+            </div>
+            <h4>{{ guide.title }}</h4>
+            <p class="guide-desc">{{ guide.description }}</p>
+            <div class="guide-footer">
+              <a [href]="guide.url" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                Play Audio / Guide ↗
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

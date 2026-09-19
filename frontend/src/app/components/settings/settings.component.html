@@ -1,0 +1,122 @@
+<div class="settings-container container">
+  <div class="settings-header">
+    <h1>Portal Settings & Preferences</h1>
+    <p class="subtitle">Control your reminder notifications, data privacy preferences, and session controls</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Loading your preferences...</p>
+    </div>
+  } @else if (settings) {
+    <div class="settings-layout grid-2">
+      <!-- Left: Notification Timers -->
+      <div class="glass-card settings-card">
+        <h3>Daily Wellness Reminders</h3>
+        <p class="card-sub">Choose which check-in alerts are active for your student account.</p>
+
+        <form (ngSubmit)="saveSettings()" class="settings-form">
+          <div class="form-group">
+            <label>Preferred Daily Alert Time</label>
+            <input type="time" [(ngModel)]="settings.reminderTime" name="reminderTime" class="form-control time-input" />
+          </div>
+
+          <div class="toggles-box">
+            <label class="toggle-row">
+              <input type="checkbox" [(ngModel)]="settings.moodReminder" name="moodReminder" />
+              <div>
+                <strong>Mood Tracker Alert</strong>
+                <span>Evening notification to log mood</span>
+              </div>
+            </label>
+
+            <label class="toggle-row">
+              <input type="checkbox" [(ngModel)]="settings.stressReminder" name="stressReminder" />
+              <div>
+                <strong>Stress Assessment Reminder</strong>
+                <span>Weekly prompts to evaluate academic fatigue</span>
+              </div>
+            </label>
+
+            <label class="toggle-row">
+              <input type="checkbox" [(ngModel)]="settings.journalReminder" name="journalReminder" />
+              <div>
+                <strong>Journaling Reminder</strong>
+                <span>Encouraging prompts for daily reflection</span>
+              </div>
+            </label>
+
+            <label class="toggle-row">
+              <input type="checkbox" [(ngModel)]="settings.habitReminder" name="habitReminder" />
+              <div>
+                <strong>Habits & Routine Reminder</strong>
+                <span>Alerts to maintain active habit streaks</span>
+              </div>
+            </label>
+
+            <label class="toggle-row">
+              <input type="checkbox" [(ngModel)]="settings.wellnessReminder" name="wellnessReminder" />
+              <div>
+                <strong>Self-Care & Mindfulness Reminders</strong>
+                <span>Hydration, stretching, and 4-7-8 breathing tips</span>
+              </div>
+            </label>
+          </div>
+
+          <button type="submit" [disabled]="saving" class="btn btn-primary btn-block">
+            {{ saving ? 'Saving...' : 'Save Reminder Settings' }}
+          </button>
+        </form>
+      </div>
+
+      <!-- Right: Privacy & Account Overview -->
+      <div class="glass-card privacy-card">
+        <h3>Privacy & Data Isolation</h3>
+        <p class="card-sub">Mind Care is designed strictly with student confidentiality as a foundational pillar.</p>
+
+        <div class="privacy-bullet-box">
+          <div class="bullet-item">
+            <span class="icon">🔒</span>
+            <div>
+              <strong>Private Journal Isolation</strong>
+              <p>Your journal entries are encrypted and inaccessible to instructors, administrators, or peers.</p>
+            </div>
+          </div>
+
+          <div class="bullet-item">
+            <span class="icon">🛡️</span>
+            <div>
+              <strong>Role-Based Access Control (RBAC)</strong>
+              <p>Only verified administrators can access content CMS modules; student health records remain strictly personal.</p>
+            </div>
+          </div>
+
+          <div class="bullet-item">
+            <span class="icon">🌱</span>
+            <div>
+              <strong>Non-Clinical Ethical Standard</strong>
+              <p>All stress levels and mood scores are self-awareness indicators and are never shared with external insurers or clinical registries.</p>
+            </div>
+          </div>
+        </div>
+
+        @if (profile) {
+          <div class="account-summary">
+            <h4>Account Summary</h4>
+            <p><strong>Account Name:</strong> {{ profile.name }}</p>
+            <p><strong>Registered Email:</strong> {{ profile.email }}</p>
+            <p><strong>Account Role:</strong> {{ profile.role | uppercase }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

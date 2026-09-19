@@ -1,0 +1,119 @@
+<div class="mood-container container">
+  <div class="mood-header">
+    <h1>Daily Mood Tracker</h1>
+    <p class="subtitle">Check in with your emotions daily to cultivate mindfulness and spot academic burnout trends early</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <!-- Mood Check-in Card -->
+  <div class="glass-card tracker-card">
+    <div class="card-header-flex">
+      <h2>{{ isEditing ? 'Edit Mood Record' : "How are you feeling today?" }}</h2>
+      <span class="date-badge">📅 {{ entryDate }}</span>
+    </div>
+
+    <div class="mood-selector-grid">
+      @for (opt of moodOptions; track opt.label) {
+        <button
+          type="button"
+          class="mood-btn"
+          [class.active]="selectedMood.label === opt.label"
+          (click)="selectMood(opt)"
+        >
+          <span class="emoji">{{ opt.emoji }}</span>
+          <span class="label">{{ opt.label }}</span>
+          <span class="score-badge">Score: {{ opt.score }}/5</span>
+        </button>
+      }
+    </div>
+
+    <div class="selected-details" [style.borderLeftColor]="selectedMood.color">
+      <strong>{{ selectedMood.label }}:</strong> {{ selectedMood.description }}
+    </div>
+
+    <div class="form-group note-group">
+      <label>Reflective Note (Optional):</label>
+      <textarea
+        [(ngModel)]="note"
+        rows="3"
+        placeholder="What influenced your mood today? Classes, exams, sleep, friendship, or personal victories..."
+        class="form-control"
+      ></textarea>
+    </div>
+
+    <div class="date-input-group">
+      <label>Entry Date:</label>
+      <input type="date" [(ngModel)]="entryDate" class="form-control date-picker" />
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="saveMood()" [disabled]="submitting" class="btn btn-primary">
+        {{ submitting ? 'Saving...' : (isEditing ? 'Save Changes' : 'Record My Mood') }}
+      </button>
+      @if (isEditing) {
+        <button (click)="cancelEdit()" class="btn btn-outline">Cancel Edit</button>
+      }
+    </div>
+  </div>
+
+  <!-- Mood History Section -->
+  <div class="history-section">
+    <div class="history-header-flex">
+      <h3>Your Mood Journey</h3>
+      
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <input type="date" [(ngModel)]="filterStartDate" class="filter-date" placeholder="From" />
+        <span class="to-text">to</span>
+        <input type="date" [(ngModel)]="filterEndDate" class="filter-date" placeholder="To" />
+        <button (click)="applyFilter()" class="btn btn-secondary btn-sm">Filter</button>
+        <button (click)="clearFilter()" class="btn btn-outline btn-sm">Reset</button>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your mood journey...</p>
+      </div>
+    } @else if (moodHistory.length === 0) {
+      <div class="empty-state glass-card">
+        <span class="empty-emoji">🌱</span>
+        <h4>No mood records found for this timeframe</h4>
+        <p>Select your mood above to begin cultivating your daily wellness habit!</p>
+      </div>
+    } @else {
+      <div class="history-grid">
+        @for (item of moodHistory; track item._id) {
+          <div class="glass-card history-card">
+            <div class="history-card-top">
+              <div class="history-emoji">{{ getEmoji(item.mood) }}</div>
+              <div class="history-info">
+                <h4>{{ item.mood }}</h4>
+                <span class="history-date">{{ item.date }}</span>
+              </div>
+              <div class="score-pill">Score: {{ item.score }}/5</div>
+            </div>
+
+            @if (item.note) {
+              <p class="history-note">"{{ item.note }}"</p>
+            } @else {
+              <p class="history-no-note">No additional notes added.</p>
+            }
+
+            <div class="history-actions">
+              <button (click)="startEdit(item)" class="btn-text edit-btn">✏️ Edit</button>
+              <button (click)="deleteEntry(item._id)" class="btn-text delete-btn">🗑️ Delete</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

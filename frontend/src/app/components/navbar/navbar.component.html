@@ -4,7 +4,7 @@
       <div class="logo-icon">🌸</div>
       <div class="logo-text">
         <span class="brand-title">MIND CARE</span>
-        <span class="brand-subtitle">Student Wellness</span>
+        <span class="brand-subtitle">Student Wellness Portal</span>
       </div>
     </a>
 
@@ -15,20 +15,30 @@
         <a routerLink="/mood" routerLinkActive="active">Mood</a>
         <a routerLink="/stress" routerLinkActive="active">Stress</a>
         <a routerLink="/journal" routerLinkActive="active">Journal</a>
-        <a routerLink="/resources" routerLinkActive="active">Wellness</a>
+        <a routerLink="/meditation" routerLinkActive="active">Meditation</a>
+        <a routerLink="/sleep" routerLinkActive="active">Sleep</a>
+        <a routerLink="/habits" routerLinkActive="active">Habits</a>
+        <a routerLink="/goals" routerLinkActive="active">Goals</a>
+        <a routerLink="/resources" routerLinkActive="active">Resources</a>
+        <a routerLink="/help" routerLinkActive="active" class="help-link">Help 🚨</a>
+
         @if (authService.isAdmin()) {
-          <a routerLink="/admin" routerLinkActive="active" class="badge-admin">Admin Panel</a>
+          <a routerLink="/admin" routerLinkActive="active" class="badge-admin">Admin</a>
         }
         
         <div class="user-menu">
-          <span class="user-greeting">Hi, {{ authService.currentUser()?.name }}</span>
+          <a routerLink="/notifications" class="icon-nav-btn" title="Notifications">🔔</a>
+          <a routerLink="/profile" class="user-greeting" title="My Profile">
+            Hi, {{ authService.currentUser()?.name?.split(' ')?.at(0) || 'Student' }}
+          </a>
           <button (click)="logout()" class="btn-logout">Logout</button>
         </div>
       } @else {
         <!-- Public Links -->
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         <a routerLink="/about" routerLinkActive="active">About Project</a>
-        <a routerLink="/resources" routerLinkActive="active">Wellness Resources</a>
+        <a routerLink="/resources" routerLinkActive="active">Wellness Library</a>
+        <a routerLink="/help" routerLinkActive="active" class="help-link">Crisis Help 🚨</a>
         <a routerLink="/login" class="nav-btn-secondary">Login</a>
         <a routerLink="/register" class="nav-btn-primary">Register</a>
       }
@@ -48,12 +58,27 @@
         <a routerLink="/mood" (click)="mobileMenuOpen = false">Mood Tracker</a>
         <a routerLink="/stress" (click)="mobileMenuOpen = false">Stress Assessment</a>
         <a routerLink="/journal" (click)="mobileMenuOpen = false">Daily Journal</a>
-        <a routerLink="/resources" (click)="mobileMenuOpen = false">Wellness Resources</a>
+        <a routerLink="/meditation" (click)="mobileMenuOpen = false">Meditation & Breathing</a>
+        <a routerLink="/sleep" (click)="mobileMenuOpen = false">Sleep Tracker</a>
+        <a routerLink="/habits" (click)="mobileMenuOpen = false">Habit Tracker</a>
+        <a routerLink="/goals" (click)="mobileMenuOpen = false">Wellness Goals</a>
+        <a routerLink="/wellness" (click)="mobileMenuOpen = false">Personalized Guidance</a>
+        <a routerLink="/history" (click)="mobileMenuOpen = false">Mood / Stress History</a>
+        <a routerLink="/analytics" (click)="mobileMenuOpen = false">Visual Analytics</a>
+        <a routerLink="/resources" (click)="mobileMenuOpen = false">Resource Library</a>
+        <a routerLink="/help" (click)="mobileMenuOpen = false">Emergency & Crisis Help</a>
+        <a routerLink="/notifications" (click)="mobileMenuOpen = false">Notifications Center</a>
+        <a routerLink="/profile" (click)="mobileMenuOpen = false">Profile & Account</a>
+        <a routerLink="/settings" (click)="mobileMenuOpen = false">Preferences & Settings</a>
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin" (click)="mobileMenuOpen = false" class="admin-mobile-link">⚙️ Admin CMS Console</a>
+        }
         <button (click)="logout()" class="btn-logout-mobile">Logout</button>
       } @else {
         <a routerLink="/" (click)="mobileMenuOpen = false">Home</a>
         <a routerLink="/about" (click)="mobileMenuOpen = false">About Project</a>
-        <a routerLink="/resources" (click)="mobileMenuOpen = false">Wellness Resources</a>
+        <a routerLink="/resources" (click)="mobileMenuOpen = false">Wellness Library</a>
+        <a routerLink="/help" (click)="mobileMenuOpen = false">Emergency Helplines</a>
         <a routerLink="/login" (click)="mobileMenuOpen = false">Login</a>
         <a routerLink="/register" (click)="mobileMenuOpen = false">Register</a>
       }

@@ -1,0 +1,131 @@
+.analytics-container {
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+.analytics-header {
+  margin-bottom: 2rem;
+}
+
+.analytics-header h1 {
+  font-size: 2.2rem;
+  color: var(--text-main);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.metrics-grid {
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.metric-icon {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.metric-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.metric-details h3 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-top: 0.2rem;
+}
+
+.charts-grid {
+  gap: 1.5rem;
+}
+
+.chart-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chart-header h3 {
+  font-size: 1.15rem;
+  color: var(--text-main);
+}
+
+.chart-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+}
+
+.tag-teal {
+  background: var(--primary-light);
+  color: var(--primary-hover);
+}
+
+.tag-red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.tag-blue {
+  background: var(--secondary-light);
+  color: var(--secondary-hover);
+}
+
+.tag-green {
+  background: var(--accent-light);
+  color: #065f46;
+}
+
+.canvas-wrapper {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3.5rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,273 @@
+.meditation-container {
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+.meditation-header {
+  margin-bottom: 2rem;
+}
+
+.meditation-header h1 {
+  font-size: 2.2rem;
+  color: var(--text-main);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.breathing-card {
+  margin-bottom: 3rem;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 250, 0.9) 100%);
+}
+
+.card-top-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-top-flex h2 {
+  font-size: 1.4rem;
+  text-align: left;
+}
+
+.method-sub {
+  font-size: 0.88rem;
+  color: var(--primary-hover);
+  font-weight: 600;
+  text-align: left;
+}
+
+.duration-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.duration-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 50px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.duration-pill.active {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: #fff;
+}
+
+.breathing-arena {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 280px;
+  margin-bottom: 1.5rem;
+}
+
+.outer-aura {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 1s ease;
+  box-shadow: 0 0 30px rgba(13, 148, 136, 0.15);
+}
+
+.outer-aura.inhale {
+  transform: scale(1.35);
+  background: rgba(13, 148, 136, 0.25);
+  box-shadow: 0 0 60px rgba(13, 148, 136, 0.4);
+}
+
+.outer-aura.hold {
+  transform: scale(1.35);
+  background: rgba(2, 132, 199, 0.25);
+  box-shadow: 0 0 60px rgba(2, 132, 199, 0.4);
+}
+
+.outer-aura.exhale {
+  transform: scale(0.9);
+  background: rgba(16, 185, 129, 0.18);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.inner-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.phase-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.countdown-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin: 0.2rem 0;
+}
+
+.total-left {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.phase-guide {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 2rem;
+  min-height: 24px;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn-lg {
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+}
+
+.guides-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.guides-header-flex h3 {
+  font-size: 1.3rem;
+}
+
+.category-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cat-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 50px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cat-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
+
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.guide-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.guide-cat-badge {
+  background: var(--primary-light);
+  color: var(--primary-hover);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+}
+
+.guide-duration {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.guide-card h4 {
+  font-size: 1.15rem;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.guide-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.guide-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 0.85rem;
+}
+
+.btn-sm {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 2.5rem;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

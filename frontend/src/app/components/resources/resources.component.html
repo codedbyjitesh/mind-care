@@ -1,27 +1,74 @@
-<div class="page-container container">
-  <div class="page-header">
-    <span class="badge badge-blue">Student Self-Care</span>
-    <h1>Wellness Resources Library</h1>
-    <p>Guides, strategies, and techniques for student health and stress management.</p>
+<div class="resources-container container">
+  <div class="resources-header">
+    <h1>Mental Health Resource Library</h1>
+    <p class="subtitle">Curated academic mental wellness literature, guided tools, stress reduction articles, and university support directories</p>
   </div>
 
-  <div class="grid-3">
-    <div class="glass-card resource-card">
-      <span class="badge badge-teal">Exam Stress</span>
-      <h3>Managing Exam Anxiety</h3>
-      <p>Break study sessions into 25-minute Pomodoro blocks and take regular short walks.</p>
+  <!-- Search & Category Bar -->
+  <div class="search-filter-card glass-card">
+    <div class="search-input-group">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+        placeholder="Search resources by title or keyword..."
+        class="form-control"
+      />
+      <button (click)="search()" class="btn btn-primary">Search</button>
+      @if (searchTerm || selectedCategory !== 'All') {
+        <button (click)="clearSearch()" class="btn btn-outline">Clear</button>
+      }
     </div>
 
-    <div class="glass-card resource-card">
-      <span class="badge badge-green">Sleep Hygiene</span>
-      <h3>Healthy Sleep Habits</h3>
-      <p>Aim for 7–8 hours of consistent sleep. Avoid screens 30 minutes before bedtime.</p>
-    </div>
-
-    <div class="glass-card resource-card">
-      <span class="badge badge-blue">Relaxation</span>
-      <h3>Box Breathing Technique</h3>
-      <p>Inhale for 4s, hold for 4s, exhale for 4s, and hold for 4s to calm your nervous system.</p>
+    <!-- 9 Categories Filter Pills -->
+    <div class="category-pills-bar">
+      @for (cat of categories; track cat) {
+        <button
+          class="cat-pill"
+          [class.active]="selectedCategory === cat"
+          (click)="filterCategory(cat)"
+        >
+          {{ cat }}
+        </button>
+      }
     </div>
   </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Loading curated wellness library...</p>
+    </div>
+  } @else if (resources.length === 0) {
+    <div class="empty-state glass-card">
+      <span class="empty-icon">🔍</span>
+      <h3>No resources found matching your criteria</h3>
+      <p>Try searching with another keyword or resetting the category filter above.</p>
+      <button (click)="clearSearch()" class="btn btn-secondary">View All Resources</button>
+    </div>
+  } @else {
+    <div class="resources-grid">
+      @for (item of resources; track item._id) {
+        <div class="glass-card resource-item-card">
+          <div class="card-top">
+            <span class="category-badge">{{ item.category }}</span>
+            <span class="icon-emoji">{{ item.icon || '📚' }}</span>
+          </div>
+
+          <h4>{{ item.title }}</h4>
+          <p class="desc">{{ item.description }}</p>
+
+          <div class="card-footer">
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+              Open Resource ↗
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

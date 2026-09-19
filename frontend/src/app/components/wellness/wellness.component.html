@@ -1,0 +1,83 @@
+<div class="wellness-container container">
+  <div class="wellness-header">
+    <h1>Personalized Wellness Guidance</h1>
+    <p class="subtitle">Evidence-based student recommendations adaptively tailored to your latest stress assessment, mood check-ins, and sleep duration</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Analyzing recent check-ins for personalized insights...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  } @else if (tipsResponse) {
+    <!-- Personalized Priority Alert Section -->
+    @if (tipsResponse.personalized.length > 0) {
+      <div class="personalized-section">
+        <div class="section-title-flex">
+          <h2>🎯 Specially Tailored for You Today</h2>
+          <span class="pulse-indicator">Active Focus Area</span>
+        </div>
+
+        <div class="priority-grid">
+          @for (tip of tipsResponse.personalized; track tip._id) {
+            <div class="glass-card priority-card">
+              <div class="priority-top">
+                <span class="condition-badge">{{ getConditionTitle(tip.condition) }}</span>
+                <span class="category-pill">{{ tip.category }}</span>
+              </div>
+              <h3>{{ tip.title }}</h3>
+              <p class="tip-desc">{{ tip.description }}</p>
+              
+              <div class="tip-actions">
+                <a routerLink="/meditation" class="btn btn-secondary btn-sm">Try Breathing Timer</a>
+                <a routerLink="/journal" class="btn btn-outline btn-sm">Reflect in Journal</a>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="glass-card balanced-banner">
+        <div class="balanced-content">
+          <span class="balanced-emoji">🌿</span>
+          <div>
+            <h3>Your Recent Indicators Look Balanced!</h3>
+            <p>No acute stress or low mood alerts detected. Explore our general student wellness guidelines below to sustain healthy momentum.</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- General Tips Section with Category Tabs -->
+    <div class="general-section">
+      <h3>Explore Student Self-Care Strategies</h3>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pill-bar">
+        @for (cat of categories; track cat) {
+          <button
+            class="cat-pill"
+            [class.active]="selectedCategory === cat"
+            (click)="filterCategory(cat)"
+          >
+            {{ cat }}
+          </button>
+        }
+      </div>
+
+      <div class="tips-grid">
+        @for (tip of getFilteredGeneralTips(); track tip._id) {
+          <div class="glass-card tip-card">
+            <div class="tip-card-top">
+              <span class="category-pill">{{ tip.category }}</span>
+            </div>
+            <h4>{{ tip.title }}</h4>
+            <p class="tip-desc">{{ tip.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

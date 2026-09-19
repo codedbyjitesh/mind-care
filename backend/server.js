@@ -21,9 +21,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const moodRoutes = require('./routes/moodRoutes');
+const stressRoutes = require('./routes/stressRoutes');
+const journalRoutes = require('./routes/journalRoutes');
+const sleepRoutes = require('./routes/sleepRoutes');
+const habitRoutes = require('./routes/habitRoutes');
+const goalRoutes = require('./routes/goalRoutes');
+const wellnessRoutes = require('./routes/wellnessRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Routes Middleware
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/mood', moodRoutes);
+app.use('/api/stress', stressRoutes);
+app.use('/api/journals', journalRoutes);
+app.use('/api/sleep', sleepRoutes);
+app.use('/api/habits', habitRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/wellness', wellnessRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health Check & Welcome Routes
 app.get('/', (req, res) => {
