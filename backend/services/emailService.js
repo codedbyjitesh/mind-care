@@ -12,9 +12,9 @@ const createTransporter = () => {
       return nodemailer.createTransport({
         service: 'gmail',
         auth: { user, pass },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 45000,
         tls: { rejectUnauthorized: false }
       });
     }
@@ -24,15 +24,32 @@ const createTransporter = () => {
       port,
       secure: port === 465,
       auth: { user, pass },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 45000,
       tls: { rejectUnauthorized: false }
     });
   }
 
   // Null transporter fallback for offline development
   return null;
+};
+
+// Verify SMTP connection at startup (non-blocking)
+const verifySmtpConnection = () => {
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.log('[Email Service] No SMTP credentials configured — running in dev/fallback mode.');
+    return;
+  }
+  transporter.verify((err) => {
+    if (err) {
+      console.error('[Email Service] ⚠️  SMTP connection FAILED:', err.message);
+      console.error('[Email Service] 👉 Check EMAIL_USER and EMAIL_PASSWORD in your .env (use a Gmail App Password).');
+    } else {
+      console.log('[Email Service] ✅ SMTP connection verified — ready to send emails.');
+    }
+  });
 };
 
 // Base HTML Wrapper for Mind Care Emails
@@ -86,7 +103,7 @@ const sendEmail = async ({ to, subject, html, fallbackLogMessage, urlForDev }) =
     try {
       const sendPromise = transporter.sendMail({ from, to, subject, html });
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('SMTP send timed out after 10 seconds')), 10000)
+        setTimeout(() => reject(new Error('SMTP send timed out after 30 seconds')), 30000)
       );
 
       const info = await Promise.race([sendPromise, timeoutPromise]);
@@ -254,6 +271,9 @@ const sendWellnessReminderEmail = async (email, name, reminderType = 'checkin') 
     urlForDev: current.link
   });
 };
+
+// Run SMTP verification once when the module is first loaded
+verifySmtpConnection();
 
 module.exports = {
   sendVerificationEmail,
