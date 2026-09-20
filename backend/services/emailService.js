@@ -1,55 +1,22 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const createTransporter = () => {
-  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.EMAIL_PORT, 10) || 587;
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASSWORD;
-
-  if (user && pass) {
-    // If Gmail SMTP, using service: 'gmail' is standard and handles ports & SSL handshakes automatically
-    if (host.includes('gmail') || user.includes('@gmail.com')) {
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user, pass },
-        connectionTimeout: 30000,
-        greetingTimeout: 30000,
-        socketTimeout: 45000,
-        tls: { rejectUnauthorized: false }
-      });
-    }
-
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-      connectionTimeout: 30000,
-      greetingTimeout: 30000,
-      socketTimeout: 45000,
-      tls: { rejectUnauthorized: false }
-    });
+// Initialise Resend client (lazy — only fails at send time if key is missing)
+const getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[Email Service] ⚠️  RESEND_API_KEY not set — emails will fall back to console log.');
+    return null;
   }
-
-  // Null transporter fallback for offline development
-  return null;
+  return new Resend(apiKey);
 };
 
-// Verify SMTP connection at startup (non-blocking)
-const verifySmtpConnection = () => {
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.log('[Email Service] No SMTP credentials configured — running in dev/fallback mode.');
-    return;
+// Verify connection at startup (non-blocking)
+const verifyEmailConnection = () => {
+  if (!process.env.RESEND_API_KEY) {
+    console.log('[Email Service] No RESEND_API_KEY configured — running in dev/fallback mode.');
+  } else {
+    console.log('[Email Service] ✅ Resend API key found — email service ready.');
   }
-  transporter.verify((err) => {
-    if (err) {
-      console.error('[Email Service] ⚠️  SMTP connection FAILED:', err.message);
-      console.error('[Email Service] 👉 Check EMAIL_USER and EMAIL_PASSWORD in your .env (use a Gmail App Password).');
-    } else {
-      console.log('[Email Service] ✅ SMTP connection verified — ready to send emails.');
-    }
-  });
 };
 
 // Base HTML Wrapper for Mind Care Emails
@@ -94,29 +61,32 @@ const wrapEmailTemplate = (title, bodyHtml) => {
   `;
 };
 
-// Send Email Helper with race timeout (never hangs API requests)
+// Send Email Helper — uses Resend over HTTPS (never blocked by cloud providers)
 const sendEmail = async ({ to, subject, html, fallbackLogMessage, urlForDev }) => {
-  const transporter = createTransporter();
-  const from = `Mind Care Portal <${process.env.EMAIL_USER || 'no-reply@mindcare.edu'}>`;
+  const resend = getResendClient();
 
-  if (transporter) {
+  // The "from" address must be a verified domain in Resend.
+  // Use onboarding@resend.dev for testing, or your own verified domain.
+  const from = process.env.EMAIL_FROM || 'Mind Care Portal <onboarding@resend.dev>';
+
+  if (resend) {
     try {
-      const sendPromise = transporter.sendMail({ from, to, subject, html });
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('SMTP send timed out after 30 seconds')), 30000)
-      );
+      const { data, error } = await resend.emails.send({ from, to, subject, html });
 
-      const info = await Promise.race([sendPromise, timeoutPromise]);
-      console.log(`[Email Service] Sent "${subject}" to ${to} (MessageId: ${info.messageId})`);
-      return info;
+      if (error) {
+        throw new Error(error.message || JSON.stringify(error));
+      }
+
+      console.log(`[Email Service] ✅ Sent "${subject}" to ${to} (id: ${data.id})`);
+      return data;
     } catch (err) {
-      console.error(`[Email Service Error] Failed to send email via SMTP:`, err.message);
+      console.error(`[Email Service Error] Failed to send email via Resend:`, err.message);
       console.log(`[Email Service Dev Fallback] ${fallbackLogMessage}:`);
       console.log(`👉 Link: ${urlForDev}`);
       return null;
     }
   } else {
-    console.log(`[Email Service Dev Mode] No SMTP config found. ${fallbackLogMessage}:`);
+    console.log(`[Email Service Dev Mode] No Resend API key. ${fallbackLogMessage}:`);
     console.log(`👉 Link: ${urlForDev}`);
     return null;
   }
@@ -207,7 +177,7 @@ const sendWelcomeEmail = async (email, name, origin) => {
         <li><strong>Daily Mood Check-ins:</strong> Track emotional trends and identify study triggers.</li>
         <li><strong>Stress Assessments:</strong> Non-clinical student evaluations with personalized wellness recommendations.</li>
         <li><strong>Private Journal:</strong> Encrypted private journaling for daily reflection.</li>
-        <li><strong>Guided Meditation & Breathing:</strong> Interactive 4-4-6 breathing timer for study breaks.</li>
+        <li><strong>Guided Meditation &amp; Breathing:</strong> Interactive 4-4-6 breathing timer for study breaks.</li>
       </ul>
 
       <div class="btn-container">
@@ -241,7 +211,7 @@ const sendWellnessReminderEmail = async (email, name, reminderType = 'checkin') 
       link: `${clientUrl}/journal`
     },
     meditation: {
-      title: 'Short Study Break & Breathing',
+      title: 'Short Study Break &amp; Breathing',
       body: 'Relax your mind with a 4-minute guided breathing exercise.',
       link: `${clientUrl}/meditation`
     }
@@ -272,8 +242,8 @@ const sendWellnessReminderEmail = async (email, name, reminderType = 'checkin') 
   });
 };
 
-// Run SMTP verification once when the module is first loaded
-verifySmtpConnection();
+// Verify email service config at startup
+verifyEmailConnection();
 
 module.exports = {
   sendVerificationEmail,
